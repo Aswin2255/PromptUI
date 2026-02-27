@@ -1,3 +1,4 @@
+'use client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,16 +10,19 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { useActionState } from 'react';
+import { signupAction } from '@/app/(auth)/actions/authaction';
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const [state, action, pending] = useActionState(signupAction, null);
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 ">
-          <form className="p-6 md:p-8">
+          <form action={action} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome</h1>
@@ -29,17 +33,50 @@ export function SignupForm({
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  name="email"
                   id="email"
                   type="email"
                   placeholder="m@example.com"
                   required
                 />
+                {state?.errors &&
+                  typeof state.errors === 'object' &&
+                  state.errors.email && (
+                    <p className="text-xs text-red-500">
+                      {state.errors.email[0]}
+                    </p>
+                  )}
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input id="password" type="password" required />
+                <Input name="password" id="password" type="password" required />
+                {state?.errors &&
+                  typeof state.errors === 'object' &&
+                  state.errors.password && (
+                    <p className="text-xs text-red-500">
+                      {state.errors.password[0]}
+                    </p>
+                  )}
+              </Field>
+              <Field>
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password">Confirm Password</FieldLabel>
+                </div>
+                <Input
+                  name="confirmPassword"
+                  id="password"
+                  type="password"
+                  required
+                />
+                {state?.errors &&
+                  typeof state.errors === 'object' &&
+                  state.errors.confirmPassword && (
+                    <p className="text-xs text-red-500">
+                      {state.errors.confirmPassword[0]}
+                    </p>
+                  )}
               </Field>
               <Field>
                 <Button type="submit">Signup</Button>
