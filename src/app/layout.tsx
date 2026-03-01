@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from 'next-themes';
+import { Toaster } from '@/components/ui/sonner';
 
 import Providers from '@/providers';
 import connecttoMongodb from '@/lib/db';
@@ -35,6 +36,7 @@ export default function RootLayout({
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
+            <Toaster position="top-right" richColors />
           </ThemeProvider>
         </body>
       </html>

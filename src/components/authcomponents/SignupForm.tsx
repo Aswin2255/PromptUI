@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signupAction } from '@/app/(auth)/actions/authaction';
 import { SignupInput, signupSchema } from '@/lib/authvalidations/authschema';
+import { toast } from 'sonner';
 
 export function SignupForm({
   className,
@@ -27,8 +28,15 @@ export function SignupForm({
     resolver: zodResolver(signupSchema),
   });
 
-  const handelSingup = (data: SignupInput) => {
-    signupAction(data);
+  const handelSingup = async (data: SignupInput) => {
+    try {
+      const result = await signupAction(data);
+      if (result?.status === false) {
+        toast.error(result.message);
+      }
+    } catch {
+      toast.error('Singup Failed');
+    }
   };
 
   return (

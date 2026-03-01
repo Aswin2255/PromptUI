@@ -12,8 +12,6 @@ const UserSchema = new Schema<IUser>(
   {
     uid: {
       type: String,
-      required: true,
-      unique: true,
     },
     email: {
       type: String,

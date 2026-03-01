@@ -8,10 +8,10 @@ declare global {
   var redis: Redis | undefined;
 }
 
-const redis = global.redis ?? getRedisClient();
+const redisClient = global.redis ?? getRedisClient();
 
 if (process.env.NODE_ENV !== 'production') {
-  global.redis = redis;
+  global.redis = redisClient;
 }
 
-export default redis;
+export default redisClient;
