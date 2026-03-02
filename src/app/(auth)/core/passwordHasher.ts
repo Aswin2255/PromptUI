@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { buffer } from 'stream/consumers';
 export function hashedPassword(
   password: string,
   salt: string,
@@ -9,6 +10,17 @@ export function hashedPassword(
       resolve(key.toString('hex'));
     });
   });
+}
+export async function comparePassword(
+  password: string,
+  salt: string,
+  dbpassword: string,
+) {
+  const inputhashedPassword = await hashedPassword(password, salt);
+  return crypto.timingSafeEqual(
+    Buffer.from(inputhashedPassword, 'hex'),
+    Buffer.from(dbpassword, 'hex'),
+  );
 }
 
 export function generateSalt(): string {

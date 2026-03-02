@@ -52,6 +52,22 @@ export function SignupForm({
                 </p>
               </div>
               <Field>
+                <FieldLabel htmlFor="email">Username</FieldLabel>
+                <Input
+                  {...register('username')}
+                  name="username"
+                  id="username"
+                  type="text"
+                  placeholder="Enter Username"
+                  required
+                />
+                {errors.username && (
+                  <p className="text-xs text-red-500">
+                    {errors.username.message}
+                  </p>
+                )}
+              </Field>
+              <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   {...register('email')}
