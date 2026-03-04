@@ -1,12 +1,13 @@
+'use server';
 import User from '@/lib/models/User';
 import redisClient from '@/lib/redisClient';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 const COOKIE_EXPIRES = 60 * 60 * 24 * 7;
 export async function createUsersession(userid: string) {
-  const sessionId = crypto.randomBytes(512).toString('hex');
+  const sessionId = crypto.randomBytes(32).toString('hex');
   redisClient.set(`session:${sessionId}`, userid, 'EX', COOKIE_EXPIRES);
-  setCookie(sessionId);
+  await setCookie(sessionId);
 }
 
 export async function setCookie(sessionid: string) {
@@ -14,12 +15,12 @@ export async function setCookie(sessionid: string) {
     const cookieStore = await cookies();
     cookieStore.set('session_id', sessionid, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
-    console.log('cookie set...');
+    console.log('cookie set');
   } catch (error) {
     console.log(error);
     throw error;

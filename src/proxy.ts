@@ -2,16 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentuser } from './app/(auth)/core/getUser';
 
 const privateRoutes = ['/', '/dashboard'];
+const authRoutes = ['/login', '/signup'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = (await middlewareAuth(request)) ?? NextResponse.next();
+  return response;
 }
 
 async function middlewareAuth(request: NextRequest) {
   if (privateRoutes.includes(request.nextUrl.pathname)) {
     const userDetails = await getCurrentuser();
     if (!userDetails) {
-      return NextResponse.redirect(new URL('/signin', request.url));
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+  if (authRoutes.includes(request.nextUrl.pathname)) {
+    const userDetails = await getCurrentuser();
+    if (userDetails) {
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 }

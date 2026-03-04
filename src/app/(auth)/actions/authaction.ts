@@ -1,5 +1,4 @@
 'use server';
-
 import { LoginInput, SignupInput } from '@/lib/authvalidations/authschema';
 import User from '@/lib/models/User';
 import {
@@ -8,6 +7,7 @@ import {
   hashedPassword,
 } from '../core/passwordHasher';
 import { createUsersession } from '../core/session';
+import { redirect } from 'next/navigation';
 
 export async function signupAction(formdata: SignupInput) {
   try {
@@ -22,6 +22,7 @@ export async function signupAction(formdata: SignupInput) {
       username: username,
       email: email,
       password: passwordHashed,
+      salt: salt,
     });
     const createdUser = await newUser.save();
     await createUsersession(createdUser?._id);
@@ -52,6 +53,7 @@ export async function loginAction(formdata: LoginInput) {
     if (!isPasswordcorrect)
       return { status: false, message: 'Invalid credentials' };
     await createUsersession(isuserExist?._id);
+    return { status: true, message: 'Login sucessfully' };
   } catch (error) {
     console.log(error);
     return {

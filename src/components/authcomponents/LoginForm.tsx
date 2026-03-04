@@ -19,11 +19,13 @@ import {
 } from '@/lib/authvalidations/authschema';
 import { useForm } from 'react-hook-form';
 import { loginAction } from '@/app/(auth)/actions/authaction';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -31,8 +33,12 @@ export function LoginForm({
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
-  const handelLogin = (data: LoginInput) => {
-    loginAction(data);
+  const handelLogin = async (data: LoginInput) => {
+    const response = await loginAction(data);
+    console.log(response);
+    if (response.status) {
+      router.push('/dashboard');
+    }
   };
 
   return (
