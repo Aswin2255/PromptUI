@@ -1,3 +1,5 @@
+import ChatInputBox from '@/components/dashboard/ChatinputBox';
+
 export default async function Dashboard() {
-  return <h1>hiii</h1>;
+  return <ChatInputBox />;
 }
