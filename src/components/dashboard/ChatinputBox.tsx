@@ -34,43 +34,26 @@ import { cn } from '@/lib/utils';
 import { useModelHook } from '@/hooks/useChat';
 import { AddModelDialog } from './AddmodelDialog';
 
-const MODELS = [
-  {
-    id: 'claude-sonnet-4-20250514',
-    label: 'Claude Sonnet 4',
-    provider: 'Anthropic',
-    color: 'bg-orange-500',
-  },
-  {
-    id: 'claude-opus-4',
-    label: 'Claude Opus 4',
-    provider: 'Anthropic',
-    color: 'bg-orange-600',
-  },
-  { id: 'gpt-4o', label: 'GPT-4o', provider: 'OpenAI', color: 'bg-green-500' },
-  {
-    id: 'gpt-4o-mini',
-    label: 'GPT-4o Mini',
-    provider: 'OpenAI',
-    color: 'bg-green-400',
-  },
-  {
-    id: 'gemini-1.5-pro',
-    label: 'Gemini 1.5 Pro',
-    provider: 'Google',
-    color: 'bg-blue-500',
-  },
-];
-
 export default function ChatInputBox() {
+  interface Model {
+    modelname: string;
+    url: string;
+    apikey: string;
+  }
   const [message, setMessage] = useState('');
-  const [selectedModel, setSelectedModel] = useState(MODELS[0]);
+
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
   const [addModelOpen, setAddModelOpen] = useState(false);
   const [newApiKey, setNewApiKey] = useState('');
   const [newProvider, setNewProvider] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { modelDetails, setModel, clearModel } = useModelHook();
+  const MODELS = modelDetails || [];
+  const [selectedModel, setSelectedModel] = useState(MODELS[0]);
+
+  const handelsaveModel = (newmodel: Model) => {
+    setModel(newmodel);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -174,9 +157,12 @@ export default function ChatInputBox() {
                   className="h-8 gap-1.5 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
                 >
                   <span
-                    className={cn('h-2 w-2 rounded-full', selectedModel.color)}
+                    className={cn(
+                      'h-2 w-2 rounded-full',
+                      selectedModel.modelname,
+                    )}
                   />
-                  {selectedModel.label}
+                  {selectedModel.modelname}
                   <ChevronDown className="h-3 w-3 opacity-60" />
                 </Button>
               </DropdownMenuTrigger>
@@ -187,14 +173,16 @@ export default function ChatInputBox() {
                 <DropdownMenuSeparator />
                 {MODELS.map((model) => (
                   <DropdownMenuItem
-                    key={model.id}
+                    key={model.modelname}
                     onClick={() => setSelectedModel(model)}
                     className="gap-2 text-sm"
                   >
-                    <span className={cn('h-2 w-2 rounded-full', model.color)} />
-                    <span className="flex-1">{model.label}</span>
+                    <span
+                      className={cn('h-2 w-2 rounded-full', model.modelname)}
+                    />
+                    <span className="flex-1">{model.modelname}</span>
                     <span className="text-xs text-muted-foreground">
-                      {model.provider}
+                      {model.modelname}
                     </span>
                   </DropdownMenuItem>
                 ))}
@@ -226,6 +214,7 @@ export default function ChatInputBox() {
         <AddModelDialog
           addModelOpen={addModelOpen}
           setAddModelOpen={setAddModelOpen}
+          onSave={handelsaveModel}
         />
       )}
     </div>
