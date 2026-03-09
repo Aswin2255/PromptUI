@@ -6,7 +6,7 @@ interface User {
 interface Model {
   modelname: string;
   url: string;
-  apikey: string;
+  apikey?: string;
 }
 
 interface Authstore {

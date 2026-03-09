@@ -11,34 +11,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { cn } from '@/lib/utils';
 import { useModelHook } from '@/hooks/useChat';
 import { AddModelDialog } from './AddmodelDialog';
+import { useAIChat } from '@/hooks/useAi';
 
 export default function ChatInputBox() {
   interface Model {
     modelname: string;
     url: string;
-    apikey: string;
+    apikey?: string;
+    type: 'local' | 'cloud';
   }
   const [message, setMessage] = useState('');
 
@@ -50,6 +37,7 @@ export default function ChatInputBox() {
   const { modelDetails, setModel, clearModel } = useModelHook();
   const MODELS = modelDetails || [];
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
+  const { mutate: sendMessage, isPending } = useAIChat();
 
   const handelsaveModel = (newmodel: Model) => {
     setModel(newmodel);
@@ -67,6 +55,14 @@ export default function ChatInputBox() {
   const handleSend = () => {
     if (!message.trim() && attachedFiles.length === 0) return;
     if (!modelDetails?.length) setAddModelOpen(true);
+    if (!selectedModel) setSelectedModel(MODELS[0]);
+    sendMessage({
+      url: selectedModel.url,
+      model: selectedModel.modelname,
+      message: message,
+      apikey: selectedModel.apikey || '',
+    });
+
     // Handle send logic
     setMessage('');
     setAttachedFiles([]);
@@ -156,13 +152,8 @@ export default function ChatInputBox() {
                   size="sm"
                   className="h-8 gap-1.5 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
                 >
-                  <span
-                    className={cn(
-                      'h-2 w-2 rounded-full',
-                      selectedModel.modelname,
-                    )}
-                  />
-                  {selectedModel.modelname}
+                  <span className={cn('h-2 w-2 rounded-full')} />
+                  {selectedModel?.modelname}
                   <ChevronDown className="h-3 w-3 opacity-60" />
                 </Button>
               </DropdownMenuTrigger>
