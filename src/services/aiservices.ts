@@ -2,9 +2,10 @@ import axios from 'axios';
 
 interface AIRESPOSNE {
   url: string;
-  apikey: string;
+  apikey?: string;
   message: string;
   model: string;
+  type: 'local' | 'cloud';
 }
 
 export const sendmessagetoAi = async ({

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Paperclip, Plus, Send, ChevronDown, Key, Cpu } from 'lucide-react';
+import { Paperclip, Plus, Send, ChevronDown, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -31,11 +31,11 @@ export default function ChatInputBox() {
 
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
   const [addModelOpen, setAddModelOpen] = useState(false);
-  const [newApiKey, setNewApiKey] = useState('');
-  const [newProvider, setNewProvider] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { modelDetails, setModel, clearModel } = useModelHook();
+  const { modelDetails, setModel, messageDetails, setchatMessage } =
+    useModelHook();
   const MODELS = modelDetails || [];
+  const CHATS = messageDetails || [];
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const { mutate: sendMessage, isPending } = useAIChat();
 
@@ -54,12 +54,21 @@ export default function ChatInputBox() {
 
   const handleSend = () => {
     if (!message.trim() && attachedFiles.length === 0) return;
-    if (!modelDetails?.length) setAddModelOpen(true);
+    if (!modelDetails?.length) {
+      setAddModelOpen(true);
+      return;
+    }
     if (!selectedModel) setSelectedModel(MODELS[0]);
+    setchatMessage({
+      message_id: '',
+      role: 'user',
+      content: message,
+    });
     sendMessage({
       url: selectedModel.url,
       model: selectedModel.modelname,
       message: message,
+      type: selectedModel.type,
       apikey: selectedModel.apikey || '',
     });
 
@@ -75,139 +84,165 @@ export default function ChatInputBox() {
     }
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center w-full h-full min-h-[60vh]">
-      {/* Greeting / Heading */}
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-semibold text-foreground tracking-tight">
-          What can I help you with?
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Choose a model, attach files, and start chatting.
-        </p>
-      </div>
+  const hasMessages = CHATS?.length;
 
-      {/* Chat Box */}
-      <div className="w-full max-w-2xl rounded-2xl border border-border bg-card shadow-sm">
-        {/* Attached files */}
-        {attachedFiles.length > 0 && (
-          <div className="flex flex-wrap gap-2 px-4 pt-3">
-            {attachedFiles.map((name) => (
-              <Badge
-                key={name}
-                variant="secondary"
-                className="gap-1 pr-1 text-xs font-normal"
-              >
-                <Paperclip className="h-3 w-3" />
-                {name}
-                <button
-                  onClick={() => removeFile(name)}
-                  className="ml-1 rounded-full hover:text-destructive transition-colors"
-                >
-                  ×
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Textarea */}
-        <Textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
-          className={cn(
-            'min-h-[100px] resize-none border-none bg-transparent px-4 pt-4 pb-2',
-            'text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none',
-          )}
-        />
-
-        {/* Bottom toolbar */}
-        <div className="flex items-center justify-between px-3 pb-3 pt-1 gap-2">
-          <div className="flex items-center gap-1">
-            {/* Attach file */}
-            <input
-              type="file"
-              multiple
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
-              onClick={() => fileInputRef.current?.click()}
-              title="Attach files"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-
-            {/* Model selector */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1.5 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-                >
-                  <span className={cn('h-2 w-2 rounded-full')} />
-                  {selectedModel?.modelname}
-                  <ChevronDown className="h-3 w-3 opacity-60" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52">
-                <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
-                  Select model
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {MODELS.map((model) => (
-                  <DropdownMenuItem
-                    key={model.modelname}
-                    onClick={() => setSelectedModel(model)}
-                    className="gap-2 text-sm"
-                  >
-                    <span
-                      className={cn('h-2 w-2 rounded-full', model.modelname)}
-                    />
-                    <span className="flex-1">{model.modelname}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {model.modelname}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setAddModelOpen(true)}
-                  className="gap-2 text-sm text-muted-foreground"
-                >
-                  <Key className="h-3.5 w-3.5" />
-                  Add model / API key
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {/* Send button */}
-          <Button
-            size="icon"
-            className="h-8 w-8 rounded-lg"
-            disabled={!message.trim() && attachedFiles.length === 0}
-            onClick={handleSend}
-          >
-            <Send className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </div>
-
-      {addModelOpen && (
-        <AddModelDialog
-          addModelOpen={addModelOpen}
-          setAddModelOpen={setAddModelOpen}
-          onSave={handelsaveModel}
-        />
+  const InputBox = (
+    <div
+      className={cn(
+        'w-full rounded-2xl border border-border bg-card shadow-sm',
+        !hasMessages && 'max-w-2xl',
       )}
+    >
+      {/* Attached files */}
+      {attachedFiles.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-4 pt-3">
+          {attachedFiles.map((name) => (
+            <Badge
+              key={name}
+              variant="secondary"
+              className="gap-1 pr-1 text-xs font-normal"
+            >
+              <Paperclip className="h-3 w-3" />
+              {name}
+              <button
+                onClick={() => removeFile(name)}
+                className="ml-1 rounded-full hover:text-destructive transition-colors"
+              >
+                ×
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      {/* Textarea */}
+      <Textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
+        className={cn(
+          'resize-none border-none bg-transparent px-4 pb-2 pt-3',
+          'text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none',
+          // Taller in empty state, compact when chatting
+          hasMessages ? 'min-h-11 max-h-30' : 'min-h-25',
+        )}
+      />
+
+      {/* Bottom toolbar */}
+      <div className="flex items-center justify-between px-3 pb-3 pt-1 gap-2">
+        <div className="flex items-center gap-1">
+          {/* Attach file */}
+          <input
+            type="file"
+            multiple
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+            onClick={() => fileInputRef.current?.click()}
+            title="Attach files"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+
+          {/* Model selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1.5 rounded-lg px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                {selectedModel?.modelname ?? 'Select model'}
+                <ChevronDown className="h-3 w-3 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-52">
+              <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
+                Select model
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {MODELS.map((model) => (
+                <DropdownMenuItem
+                  key={model.modelname}
+                  onClick={() => setSelectedModel(model)}
+                  className="gap-2 text-sm"
+                >
+                  <span className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="flex-1">{model.modelname}</span>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setAddModelOpen(true)}
+                className="gap-2 text-sm text-muted-foreground"
+              >
+                <Key className="h-3.5 w-3.5" />
+                Add model / API key
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Send button */}
+        <Button
+          size="icon"
+          className="h-8 w-8 rounded-lg"
+          disabled={
+            (!message.trim() && attachedFiles.length === 0) || isPending
+          }
+          onClick={handleSend}
+        >
+          <Send className="h-3.5 w-3.5" />
+        </Button>
+      </div>
     </div>
+  );
+
+  if (!hasMessages) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full min-h-[60vh]">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">
+            What can I help you with?
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Choose a model, attach files, and start chatting.
+          </p>
+        </div>
+
+        {InputBox}
+
+        {addModelOpen && (
+          <AddModelDialog
+            addModelOpen={addModelOpen}
+            setAddModelOpen={setAddModelOpen}
+            onSave={handelsaveModel}
+          />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="sticky bottom-0 left-0 right-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm px-4 py-3">
+        <div className="mx-auto w-full max-w-3xl">{InputBox}</div>
+
+        {addModelOpen && (
+          <AddModelDialog
+            addModelOpen={addModelOpen}
+            setAddModelOpen={setAddModelOpen}
+            onSave={handelsaveModel}
+          />
+        )}
+      </div>
+    </>
   );
 }

@@ -7,6 +7,13 @@ interface Model {
   modelname: string;
   url: string;
   apikey?: string;
+  type: 'local' | 'cloud';
+}
+
+interface Message {
+  message_id: string;
+  role: 'user' | 'ai';
+  content: string;
 }
 
 interface Authstore {
@@ -18,6 +25,11 @@ interface Modelstore {
   modelDetails: Model[];
   setModel: (model: Model) => void;
   clearModel: () => void;
+}
+
+interface Messagestore {
+  messageDetails: Message[];
+  setchatMessage: (message: Message) => void;
 }
 
 export const useAuthUser = create<Authstore>((set) => ({
@@ -45,3 +57,10 @@ export const useModel = create<Modelstore>()(
     },
   ),
 );
+
+export const useMessage = create<Messagestore>((set) => ({
+  messageDetails: [],
+  setchatMessage(message: Message) {
+    set((state) => ({ messageDetails: [...state.messageDetails, message] }));
+  },
+}));
