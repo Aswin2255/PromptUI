@@ -7,7 +7,11 @@ interface AIRESPOSNE {
   model: string;
   type: 'local' | 'cloud';
 }
-
+interface CHATREPSONSE {
+  model: string;
+  aiResponse: string;
+  total_duration: number;
+}
 export const sendmessagetoAi = async ({
   url,
   apikey,
@@ -30,8 +34,22 @@ export const sendmessagetoAi = async ({
       },
     );
 
-    return data.response;
+    return data;
   } catch (error) {
     throw error;
+  }
+};
+
+export const savetoDb = async (details: CHATREPSONSE) => {
+  try {
+    console.log('reached');
+
+    const { data } = await axios.post(
+      'http://localhost:3000/api/chats',
+      details,
+    );
+    console.log(data);
+  } catch (error) {
+    console.log(error);
   }
 };

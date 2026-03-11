@@ -65,7 +65,7 @@ export default function ChatInputBox() {
       content: message,
     });
     sendMessage({
-      url: selectedModel.url,
+      url: `${selectedModel.url}/api/generate`,
       model: selectedModel.modelname,
       message: message,
       type: selectedModel.type,
