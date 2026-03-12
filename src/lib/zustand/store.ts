@@ -21,6 +21,11 @@ interface Authstore {
   setauthUser: (user: User) => void;
 }
 
+interface Typingstore {
+  isTyping: boolean;
+  setistyping: (value: boolean) => void;
+}
+
 interface Modelstore {
   modelDetails: Model[];
   setModel: (model: Model) => void;
@@ -62,5 +67,12 @@ export const useMessage = create<Messagestore>((set) => ({
   messageDetails: [],
   setchatMessage(message: Message) {
     set((state) => ({ messageDetails: [...state.messageDetails, message] }));
+  },
+}));
+
+export const useTyping = create<Typingstore>((set) => ({
+  isTyping: false,
+  setistyping(value: boolean) {
+    set({ isTyping: value });
   },
 }));

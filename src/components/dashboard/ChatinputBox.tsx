@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Paperclip, Plus, Send, ChevronDown, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useModelHook } from '@/hooks/useChat';
 import { AddModelDialog } from './AddmodelDialog';
 import { useAIChat } from '@/hooks/useAi';
+import { useTyping } from '@/lib/zustand/store';
 
 export default function ChatInputBox() {
   interface Model {
@@ -38,10 +39,15 @@ export default function ChatInputBox() {
   const CHATS = messageDetails || [];
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const { mutate: sendMessage, isPending } = useAIChat();
+  const { setistyping } = useTyping();
 
   const handelsaveModel = (newmodel: Model) => {
     setModel(newmodel);
   };
+
+  useEffect(() => {
+    setistyping(isPending);
+  }, [isPending]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
