@@ -23,6 +23,16 @@ const ChatSchema = new Schema(
       type: Number, // time taken for response
       required: true,
     },
+    chat_id: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    session_id: {
+      type: String,
+      unique: true,
+      required: true,
+    },
   },
   {
     timestamps: true, // adds createdAt & updatedAt

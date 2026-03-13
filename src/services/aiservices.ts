@@ -1,3 +1,4 @@
+import api from '@/lib/axiosinstance';
 import axios from 'axios';
 
 interface AIRESPOSNE {
@@ -44,10 +45,7 @@ export const savetoDb = async (details: CHATREPSONSE) => {
   try {
     console.log('reached');
 
-    const { data } = await axios.post(
-      'http://localhost:3000/api/chats',
-      details,
-    );
+    const { data } = await api.post('/api/chat', details);
     console.log(data);
   } catch (error) {
     console.log(error);

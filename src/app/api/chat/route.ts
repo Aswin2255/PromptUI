@@ -1,9 +1,13 @@
+import { Chat } from '@/lib/models/Chathistory';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log(body);
+    const { model, aiResposne, total_duration } = body;
+    if (!model || !aiResposne || !total_duration) {
+      return NextResponse.json({ err: 'Invalid input' }, { status: 400 });
+    }
   } catch (error) {
     console.error('[/api/chat] Error:', error);
     return NextResponse.json(
