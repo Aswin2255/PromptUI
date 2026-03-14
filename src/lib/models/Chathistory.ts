@@ -2,6 +2,14 @@ import { Schema, models, model } from 'mongoose';
 
 const ChatSchema = new Schema(
   {
+    chatsession_id: {
+      type: String,
+      required: true,
+    },
+    chat_message_id: {
+      type: String,
+      require: true,
+    },
     role: {
       type: String,
       enum: ['user', 'ai'],
@@ -11,27 +19,18 @@ const ChatSchema = new Schema(
       type: String,
       required: true,
     },
-    question: {
-      type: String,
-      required: true,
-    },
-    response: {
-      type: String,
-      required: true,
-    },
+
     duration: {
       type: Number, // time taken for response
       required: true,
     },
-    chat_id: {
+    content: {
       type: String,
-      unique: true,
-      required: true,
+      require: true,
     },
-    session_id: {
+    parrent_chatid: {
       type: String,
-      unique: true,
-      required: true,
+      default: '',
     },
   },
   {
