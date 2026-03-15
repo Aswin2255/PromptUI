@@ -51,3 +51,14 @@ export const savetoDb = async (details: CHATREPSONSE) => {
     console.log(error);
   }
 };
+
+export const getmessageHistory = async () => {
+  try {
+    const { data } = await api.get('/api/chat');
+    if (data.status) {
+      return data.message;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

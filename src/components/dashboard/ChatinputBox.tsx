@@ -47,7 +47,7 @@ export default function ChatInputBox() {
 
   useEffect(() => {
     setistyping(isPending);
-  }, [isPending]);
+  }, [isPending, setistyping]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);

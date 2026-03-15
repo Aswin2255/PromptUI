@@ -1,6 +1,15 @@
 import { Schema, models, model } from 'mongoose';
+export interface ICHAT extends Document {
+  chatsession_id: string;
+  chat_message_id: string;
+  role: 'user' | 'ai';
+  model: string;
+  duration: number;
+  content: string;
+  parrent_chatid: string;
+}
 
-const ChatSchema = new Schema(
+const ChatSchema = new Schema<ICHAT>(
   {
     chatsession_id: {
       type: String,

@@ -11,11 +11,44 @@ export async function POST(req: NextRequest) {
     }
     const individualChatId = generateUid();
     const chatsessionId = generateUid();
-    const newChat = new Chat({});
+    const newChat = new Chat({
+      chatsessionId: chatsessionId,
+      chat_message_id: individualChatId,
+      role: 'ai',
+      model: model,
+      duration: total_duration,
+      content: aiResposne,
+      parrent_chatid: '',
+    });
+    await newChat.save();
+    return NextResponse.json(
+      { success: true, message: 'Chat Saved Successfully' },
+      { status: 200 },
+    );
   } catch (error) {
-    console.error('[/api/chat] Error:', error);
+    console.error('[/api/chat] POST Error:', error);
     return NextResponse.json(
       { err: 'unexpected error occured' },
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    const getallMessage = await Chat.find();
+    return NextResponse.json(
+      {
+        status: true,
+        chathistory: getallMessage,
+        message: 'Message fetched sucessfully',
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error('[/api/chat] GET Error:', error);
+    return NextResponse.json(
+      { er: 'unexpected error occured' },
       { status: 500 },
     );
   }
