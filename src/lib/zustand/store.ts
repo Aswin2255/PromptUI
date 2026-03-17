@@ -19,6 +19,7 @@ interface Message {
 interface Authstore {
   authUser: User;
   setauthUser: (user: User) => void;
+  logout: () => void;
 }
 
 interface Typingstore {
@@ -43,6 +44,9 @@ export const useAuthUser = create<Authstore>((set) => ({
   },
   setauthUser(user) {
     set({ authUser: user });
+  },
+  logout() {
+    set({ authUser: { name: '' } });
   },
 }));
 

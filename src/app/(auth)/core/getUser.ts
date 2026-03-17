@@ -1,3 +1,4 @@
+'use server';
 import { cookies } from 'next/headers';
 
 export async function getCurrentuser() {
@@ -9,4 +10,10 @@ export async function getCurrentuser() {
   } catch {
     return null;
   }
+}
+
+export async function userlogout() {
+  const cookieStore = await cookies();
+
+  cookieStore.delete('session_id');
 }
