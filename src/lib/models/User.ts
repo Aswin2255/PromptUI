@@ -8,6 +8,9 @@ export interface IUser extends Document {
   password: string;
   createdAt: Date;
   updatedAt: Date;
+  googleId: string;
+  picture: string;
+  typeoflogin: 'google' | 'manual';
 }
 
 const UserSchema = new Schema<IUser>(
@@ -33,6 +36,17 @@ const UserSchema = new Schema<IUser>(
     salt: {
       type: String,
       required: true,
+    },
+    googleId: {
+      type: String,
+    },
+    picture: {
+      type: String,
+    },
+    typeoflogin: {
+      type: String,
+      enum: ['google', 'manual'],
+      default: 'manual',
     },
   },
   {
