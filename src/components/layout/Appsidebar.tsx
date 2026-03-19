@@ -26,6 +26,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { SidebarActions } from './SidebarAction';
 
 // This is sample data.
 const data = {
@@ -265,6 +266,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
+        <SidebarActions />
         <NavFavorites favorites={data.favorites} />
       </SidebarContent>
       <SidebarRail />
