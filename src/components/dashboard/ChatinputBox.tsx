@@ -20,6 +20,7 @@ import { useModelHook } from '@/hooks/useChat';
 import { AddModelDialog } from './AddmodelDialog';
 import { useAIChat } from '@/hooks/useAi';
 import { useTyping } from '@/lib/zustand/store';
+import { useRouter } from 'next/navigation';
 
 export default function ChatInputBox() {
   interface Model {
@@ -29,6 +30,8 @@ export default function ChatInputBox() {
     type: 'local' | 'cloud';
   }
   const [message, setMessage] = useState('');
+
+  const router = useRouter();
 
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
   const [addModelOpen, setAddModelOpen] = useState(false);
@@ -70,17 +73,19 @@ export default function ChatInputBox() {
       role: 'user',
       content: message,
     });
+    const randomChatid = crypto.randomUUID();
     sendMessage({
       url: `${selectedModel.url}/api/generate`,
       model: selectedModel.modelname,
       message: message,
       type: selectedModel.type,
       apikey: selectedModel.apikey || '',
+      randomChatid,
     });
-
     // Handle send logic
     setMessage('');
     setAttachedFiles([]);
+    router.push(`/dashboard/chat/${randomChatid}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

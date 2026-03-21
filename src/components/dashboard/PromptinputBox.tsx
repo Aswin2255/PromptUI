@@ -1,5 +1,43 @@
 'use client';
 
+// ── Theme CSS (inject via a <style> tag or your global CSS file) ──
+// Paste the block below into your globals.css if preferred.
+const THEME_STYLES = `
+  :root {
+    --bg-page:        #ffffff;
+    --bg-card:        #f4f4f4;
+    --border:         rgba(0, 0, 0, 0.08);
+    --border-focus:   rgba(0, 0, 0, 0.18);
+    --text-primary:   #111111;
+    --text-secondary: #666666;
+    --text-placeholder: #aaaaaa;
+    --chip-bg:        rgba(0, 0, 0, 0.05);
+    --chip-border:    rgba(0, 0, 0, 0.08);
+    --dropdown-bg:    #ffffff;
+    --item-hover:     rgba(0, 0, 0, 0.05);
+    --item-active:    rgba(16, 185, 129, 0.08);
+    --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+  }
+
+  textarea::placeholder { color: var(--text-placeholder); }
+
+  .dark {
+    --bg-page:        #212121;
+    --bg-card:        #2f2f2f;
+    --border:         rgba(255, 255, 255, 0.08);
+    --border-focus:   rgba(255, 255, 255, 0.20);
+    --text-primary:   #ececec;
+    --text-secondary: #8e8ea0;
+    --text-placeholder: #8e8ea0;
+    --chip-bg:        rgba(255, 255, 255, 0.07);
+    --chip-border:    rgba(255, 255, 255, 0.10);
+    --dropdown-bg:    #2f2f2f;
+    --item-hover:     rgba(255, 255, 255, 0.07);
+    --item-active:    rgba(16, 185, 129, 0.10);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.10);
+  }
+`;
+
 import {
   useState,
   useRef,
@@ -25,15 +63,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import {
-  Plus,
-  Send,
-  Mic,
-  Paperclip,
-  ChevronDown,
-  Key,
-  Loader2,
-} from 'lucide-react';
+import { Plus, Paperclip, ChevronDown, Key } from 'lucide-react';
 
 interface Model {
   id: string;
@@ -53,10 +83,7 @@ interface ChatInputBoxProps {
   onSend?: (message: string, files: string[]) => void;
 }
 
-export default function PromptinputBox({
-  hasMessages = false,
-  onSend,
-}: ChatInputBoxProps) {
+export default function PromptinputBox({ onSend }: ChatInputBoxProps) {
   const [message, setMessage] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
   const [isPending, setIsPending] = useState(false);
@@ -107,20 +134,21 @@ export default function PromptinputBox({
   const removeFile = (name: string) =>
     setAttachedFiles((prev) => prev.filter((f) => f !== name));
 
-  const canSend = (!!message.trim() || attachedFiles.length > 0) && !isPending;
-
   return (
     <TooltipProvider delayDuration={300}>
+      {/* ── Theme styles ── */}
+      <style dangerouslySetInnerHTML={{ __html: THEME_STYLES }} />
+
       {/* ── Fixed bottom bar ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center gap-2 px-4 pb-5 pt-10 bg-gradient-to-t from-[#212121] via-[#212121]/95 to-transparent pointer-events-none">
-        {/* Input card — pointer-events back on so it's clickable */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 px-4 pb-5 w-full max-w-2xl pointer-events-none">
+        {/* Input card */}
         <div
-          className={cn(
-            'w-full pointer-events-auto',
-            'rounded-2xl border border-white/[0.08] bg-[#2f2f2f] shadow-2xl',
-            'transition-[border-color] duration-200 focus-within:border-white/20',
-            !hasMessages && 'max-w-2xl',
-          )}
+          className="w-full pointer-events-auto rounded-2xl transition-[border-color] duration-200"
+          style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+          }}
+          onFocus={() => {}}
         >
           {/* ── Attached file chips ── */}
           {attachedFiles.length > 0 && (
@@ -129,13 +157,19 @@ export default function PromptinputBox({
                 <Badge
                   key={name}
                   variant="secondary"
-                  className="gap-1.5 pr-1 text-xs font-normal bg-white/[0.07] text-[#acacac] border border-white/10"
+                  className="gap-1.5 pr-1 text-xs font-normal"
+                  style={{
+                    background: 'var(--chip-bg)',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--chip-border)',
+                  }}
                 >
                   <Paperclip className="h-3 w-3 shrink-0" />
-                  <span className="max-w-[120px] truncate">{name}</span>
+                  <span className="max-w-30 truncate">{name}</span>
                   <button
                     onClick={() => removeFile(name)}
-                    className="ml-0.5 px-0.5 text-sm leading-none text-[#777] hover:text-red-400 transition-colors rounded-full"
+                    className="ml-0.5 px-0.5 text-sm leading-none hover:text-red-400 transition-colors rounded-full"
+                    style={{ color: 'var(--text-secondary)' }}
                   >
                     ×
                   </button>
@@ -154,18 +188,19 @@ export default function PromptinputBox({
             rows={1}
             className={cn(
               'resize-none border-none bg-transparent px-4 pb-2 pt-3.5 shadow-none',
-              'text-[15px] leading-relaxed text-[#ececec] placeholder:text-[#8e8ea0]',
+              'text-[15px] leading-relaxed',
               'focus-visible:ring-0 focus-visible:ring-offset-0',
-              'overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10',
-              hasMessages
-                ? 'min-h-[44px] max-h-[200px]'
-                : 'min-h-[60px] max-h-[200px]',
+              'overflow-y-auto scrollbar-thin scrollbar-track-transparent',
+              'min-h-15 max-h-50',
             )}
+            style={{
+              color: 'var(--text-primary)',
+              // placeholder color via CSS variable trick
+            }}
           />
 
           {/* ── Toolbar ── */}
           <div className="flex items-center justify-between gap-2 px-3 pb-3 pt-1">
-            {/* Left: attach + model picker */}
             <div className="flex items-center gap-1">
               <input
                 type="file"
@@ -180,7 +215,8 @@ export default function PromptinputBox({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-xl text-[#8e8ea0] hover:text-[#ececec] hover:bg-white/[0.08]"
+                    className="h-8 w-8 rounded-xl transition-colors"
+                    style={{ color: 'var(--text-secondary)' }}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Plus className="h-4 w-4" />
@@ -188,7 +224,12 @@ export default function PromptinputBox({
                 </TooltipTrigger>
                 <TooltipContent
                   side="top"
-                  className="bg-[#1a1a1a] border-white/10 text-[#aaa] text-xs"
+                  className="text-xs"
+                  style={{
+                    background: 'var(--dropdown-bg)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-secondary)',
+                  }}
                 >
                   Attach files
                 </TooltipContent>
@@ -199,9 +240,10 @@ export default function PromptinputBox({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 gap-1.5 rounded-xl px-2.5 text-xs font-medium text-[#8e8ea0] hover:text-[#ececec] hover:bg-white/[0.08]"
+                    className="h-8 gap-1.5 rounded-xl px-2.5 text-xs font-medium transition-colors"
+                    style={{ color: 'var(--text-secondary)' }}
                   >
-                    <span className="h-[7px] w-[7px] rounded-full bg-emerald-400 shrink-0" />
+                    <span className="h-1.75 w-1.75 rounded-full bg-emerald-400 shrink-0" />
                     {selectedModel.label}
                     <ChevronDown className="h-3 w-3 opacity-60" />
                   </Button>
@@ -209,24 +251,36 @@ export default function PromptinputBox({
 
                 <DropdownMenuContent
                   align="start"
-                  className="w-52 rounded-xl border-white/10 bg-[#2f2f2f] shadow-2xl"
+                  className="w-52 rounded-xl shadow-2xl"
+                  style={{
+                    background: 'var(--dropdown-bg)',
+                    border: '1px solid var(--border)',
+                  }}
                 >
-                  <DropdownMenuLabel className="text-xs font-normal text-[#666]">
+                  <DropdownMenuLabel
+                    className="text-xs font-normal"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     Select model
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-white/[0.07]" />
+                  <DropdownMenuSeparator
+                    style={{ background: 'var(--border)' }}
+                  />
 
                   {MODELS.map((model) => (
                     <DropdownMenuItem
                       key={model.id}
                       onClick={() => setSelectedModel(model)}
-                      className={cn(
-                        'gap-2 rounded-lg text-sm text-[#ececec] cursor-pointer',
-                        'focus:bg-white/[0.07] focus:text-[#ececec]',
-                        model.id === selectedModel.id && 'bg-emerald-500/10',
-                      )}
+                      className="gap-2 rounded-lg text-sm cursor-pointer"
+                      style={{
+                        color: 'var(--text-primary)',
+                        background:
+                          model.id === selectedModel.id
+                            ? 'var(--item-active)'
+                            : undefined,
+                      }}
                     >
-                      <span className="h-[7px] w-[7px] rounded-full bg-emerald-400 shrink-0" />
+                      <span className="h-1.75 w-1.75 rounded-full bg-emerald-400 shrink-0" />
                       <span className="flex-1">{model.label}</span>
                       {model.id === selectedModel.id && (
                         <span className="text-xs text-emerald-400">✓</span>
@@ -234,60 +288,21 @@ export default function PromptinputBox({
                     </DropdownMenuItem>
                   ))}
 
-                  <DropdownMenuSeparator className="bg-white/[0.07]" />
-                  <DropdownMenuItem className="gap-2 rounded-lg text-sm text-[#8e8ea0] cursor-pointer focus:bg-white/[0.07] focus:text-[#acacac]">
+                  <DropdownMenuSeparator
+                    style={{ background: 'var(--border)' }}
+                  />
+                  <DropdownMenuItem
+                    className="gap-2 rounded-lg text-sm cursor-pointer"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     <Key className="h-3.5 w-3.5" />
                     Add model / API key
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-
-            {/* Right: mic + send */}
-            <div className="flex items-center gap-1.5">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-xl text-[#8e8ea0] hover:text-[#ececec] hover:bg-white/[0.08]"
-                  >
-                    <Mic className="h-3.5 w-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  className="bg-[#1a1a1a] border-white/10 text-[#aaa] text-xs"
-                >
-                  Voice input
-                </TooltipContent>
-              </Tooltip>
-
-              <Button
-                size="icon"
-                disabled={!canSend}
-                onClick={handleSend}
-                className={cn(
-                  'h-8 w-8 rounded-xl transition-all duration-150 active:scale-95',
-                  canSend
-                    ? 'bg-[#ececec] text-[#212121] hover:bg-white'
-                    : 'bg-white/10 text-[#555] cursor-not-allowed opacity-100',
-                )}
-              >
-                {isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Send className="h-3.5 w-3.5" />
-                )}
-              </Button>
-            </div>
           </div>
         </div>
-
-        {/* Disclaimer */}
-        <p className="pointer-events-auto text-[11px] text-[#555] select-none">
-          AI can make mistakes. Check important info.
-        </p>
       </div>
     </TooltipProvider>
   );
