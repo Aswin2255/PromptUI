@@ -27,9 +27,11 @@ export const useGetMessageHistory = () => {
 export const useAIChat = () => {
   return useMutation({
     mutationFn: sendmessagetoAi,
-    onSuccess: async (response) => {
+    onSuccess: async (response, variables) => {
       const { model, response: aiResponse, total_duration } = response;
-      await savetoDb({ model, aiResponse, total_duration });
+      const randomid = variables?.randomChatid; //we will get every thing passed to the mutate function here
+      const userMsg = variables.message;
+      await savetoDb({ model, aiResponse, total_duration, randomid, userMsg });
     },
   });
 };

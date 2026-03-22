@@ -13,6 +13,8 @@ interface CHATREPSONSE {
   model: string;
   aiResponse: string;
   total_duration: number;
+  randomid: string;
+  userMsg: string;
 }
 export const sendmessagetoAi = async ({
   url,

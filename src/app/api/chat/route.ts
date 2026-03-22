@@ -1,26 +1,32 @@
-import { generateUid } from '@/lib/idgenerator';
 import { Chat } from '@/lib/models/Chathistory';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { model, aiResposne, total_duration } = body;
-    if (!model || !aiResposne || !total_duration) {
-      return NextResponse.json({ err: 'Invalid input' }, { status: 400 });
+    const { model, aiResponse, total_duration, randomid, userMsg } = body;
+    if (!model || !aiResponse || !total_duration || !randomid || !userMsg) {
+      return NextResponse.json(
+        { err: 'Invalid input parametes' },
+        { status: 400 },
+      );
     }
-    const individualChatId = generateUid();
-    const chatsessionId = generateUid();
+    const newuserChat = new Chat({
+      chatsession_id: randomid,
+      role: 'user',
+      model: model,
+      duration: total_duration,
+      content: userMsg,
+    });
     const newChat = new Chat({
-      chatsessionId: chatsessionId,
-      chat_message_id: individualChatId,
+      chatsession_id: randomid,
       role: 'ai',
       model: model,
       duration: total_duration,
-      content: aiResposne,
-      parrent_chatid: '',
+      content: aiResponse,
     });
     await newChat.save();
+    await newuserChat.save();
     return NextResponse.json(
       { success: true, message: 'Chat Saved Successfully' },
       { status: 200 },

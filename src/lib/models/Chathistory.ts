@@ -15,10 +15,6 @@ const ChatSchema = new Schema<ICHAT>(
       type: String,
       required: true,
     },
-    chat_message_id: {
-      type: String,
-      require: true,
-    },
     role: {
       type: String,
       enum: ['user', 'ai'],
@@ -36,10 +32,6 @@ const ChatSchema = new Schema<ICHAT>(
     content: {
       type: String,
       require: true,
-    },
-    parrent_chatid: {
-      type: String,
-      default: '',
     },
   },
   {
