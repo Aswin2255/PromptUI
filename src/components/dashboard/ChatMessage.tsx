@@ -68,15 +68,64 @@ function AIMessage({ content }: { content: string }) {
   );
 }
 export default function ChatMessage() {
-  const { messageDetails } = useMessage();
-  const { isTyping } = useTyping();
+  const messageDetails = [
+    {
+      message_id: '1',
+      role: 'user',
+      content: 'Hi',
+    },
+    {
+      message_id: '2',
+      role: 'assistant',
+      content: 'Hello! How can I help you today?',
+    },
+    {
+      message_id: '3',
+      role: 'user',
+      content: 'I need help with my project',
+    },
+    {
+      message_id: '4',
+      role: 'assistant',
+      content: 'Sure, tell me more about your project.',
+    },
+    {
+      message_id: '3',
+      role: 'user',
+      content: 'I need help with my project',
+    },
+    {
+      message_id: '4',
+      role: 'assistant',
+      content: 'Sure, tell me more about your project.',
+    },
+    {
+      message_id: '3',
+      role: 'user',
+      content: 'I need help with my project',
+    },
+    {
+      message_id: '4',
+      role: 'assistant',
+      content: 'Sure, tell me more about your project.',
+    },
+    {
+      message_id: '3',
+      role: 'user',
+      content: 'I need help with my project',
+    },
+    {
+      message_id: '4',
+      role: 'assistant',
+      content: 'Sure, tell me more about your project.',
+    },
+  ];
   return (
     <>
       {messageDetails?.length && (
         <>
           {messageDetails?.map((msg, index) => (
             <div key={index}>
-              {isTyping && <TypingIndicator />}
               {msg.role === 'user' ? (
                 <UserMessage content={msg.content} />
               ) : (
