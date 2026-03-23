@@ -11,9 +11,11 @@ interface Model {
 }
 
 interface Message {
-  message_id: string;
-  role: 'user' | 'ai';
+  chatsession_id: string;
   content: string;
+  role: 'user' | 'ai';
+  model: string;
+  createdAt: string;
 }
 
 interface Authstore {
