@@ -36,10 +36,8 @@ export default function ChatInputBox() {
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
   const [addModelOpen, setAddModelOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { modelDetails, setModel, messageDetails, setchatMessage } =
-    useModelHook();
+  const { modelDetails, setModel, setchatMessage } = useModelHook();
   const MODELS = modelDetails || [];
-  const CHATS = messageDetails || [];
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const { mutate: sendMessage, isPending } = useAIChat();
   const { setistyping } = useTyping();
@@ -95,13 +93,11 @@ export default function ChatInputBox() {
     }
   };
 
-  const hasMessages = CHATS?.length;
-
   const InputBox = (
     <div
       className={cn(
         'w-full rounded-2xl border border-border bg-card shadow-sm',
-        !hasMessages && 'max-w-2xl',
+        'max-w-2xl',
       )}
     >
       {/* Attached files */}
@@ -136,7 +132,7 @@ export default function ChatInputBox() {
           'resize-none border-none bg-transparent px-4 pb-2 pt-3',
           'text-sm placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none',
           // Taller in empty state, compact when chatting
-          hasMessages ? 'min-h-11 max-h-30' : 'min-h-25',
+          'min-h-25',
         )}
       />
 
@@ -216,8 +212,8 @@ export default function ChatInputBox() {
     </div>
   );
 
-  if (!hasMessages) {
-    return (
+  return (
+    <>
       <div className="flex flex-col items-center justify-center w-full h-full min-h-[60vh]">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-foreground tracking-tight">
@@ -229,22 +225,6 @@ export default function ChatInputBox() {
         </div>
 
         {InputBox}
-
-        {addModelOpen && (
-          <AddModelDialog
-            addModelOpen={addModelOpen}
-            setAddModelOpen={setAddModelOpen}
-            onSave={handelsaveModel}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div className="sticky bottom-0 left-0 right-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm px-4 py-3">
-        <div className="mx-auto w-full max-w-3xl">{InputBox}</div>
 
         {addModelOpen && (
           <AddModelDialog
