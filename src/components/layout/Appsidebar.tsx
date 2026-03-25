@@ -16,9 +16,6 @@ import {
 } from 'lucide-react';
 
 import { NavFavorites } from './Navfavorites';
-import { NavMain } from './Navmain';
-import { NavSecondary } from './Navsec';
-import { NavWorkspaces } from './Navworkspace';
 import { TeamSwitcher } from './Teamswitcher';
 import {
   Sidebar,

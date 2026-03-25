@@ -66,11 +66,6 @@ export default function ChatInputBox() {
       return;
     }
     if (!selectedModel) setSelectedModel(MODELS[0]);
-    setchatMessage({
-      message_id: '',
-      role: 'user',
-      content: message,
-    });
     const randomChatid = crypto.randomUUID();
     sendMessage({
       url: `${selectedModel.url}/api/generate`,

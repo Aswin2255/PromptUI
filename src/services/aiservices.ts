@@ -46,10 +46,7 @@ export const sendmessagetoAi = async ({
 
 export const savetoDb = async (details: CHATREPSONSE) => {
   try {
-    console.log('reached');
-
     const { data } = await api.post('/api/chat', details);
-    console.log(data);
   } catch (error) {
     console.log(error);
   }
