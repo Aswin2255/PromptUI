@@ -8,6 +8,7 @@ interface AIRESPOSNE {
   model: string;
   type: 'local' | 'cloud';
   randomChatid: string;
+  userdetails: string | null;
 }
 interface CHATREPSONSE {
   model: string;
@@ -15,6 +16,7 @@ interface CHATREPSONSE {
   total_duration: number;
   randomid: string;
   userMsg: string;
+  userdetails: string | null;
 }
 export const sendmessagetoAi = async ({
   url,

@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
 
 const ChatSchema = new Schema(
   {
@@ -12,22 +12,18 @@ const ChatSchema = new Schema(
           type: String,
           enum: ['user', 'ai'],
         },
-        parts: [
-          {
-            message: {
-              type: String,
-              require: true,
-            },
-            model: {
-              type: String,
-              require: true,
-            },
-            duration: {
-              type: String,
-              require: false,
-            },
-          },
-        ],
+        message: {
+          type: String,
+          require: true,
+        },
+        model: {
+          type: String,
+          require: true,
+        },
+        duration: {
+          type: String,
+          require: false,
+        },
       },
     ],
   },
@@ -35,3 +31,5 @@ const ChatSchema = new Schema(
     timestamps: true, // adds createdAt & updatedAt
   },
 );
+
+export const Chat = models.Chat || model('Chat', ChatSchema);

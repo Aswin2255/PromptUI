@@ -11,12 +11,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  LoginInput,
-  SignupInput,
-  signupSchema,
-  loginSchema,
-} from '@/lib/authvalidations/authschema';
+import { LoginInput, loginSchema } from '@/lib/authvalidations/authschema';
 import { useForm } from 'react-hook-form';
 import { loginAction } from '@/app/(auth)/actions/authaction';
 import { useRouter } from 'next/navigation';
@@ -29,7 +24,7 @@ export function LoginForm({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });

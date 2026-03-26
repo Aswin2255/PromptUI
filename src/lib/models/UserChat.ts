@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
 
 const UserchatSchema = new Schema(
   {
@@ -28,3 +28,5 @@ const UserchatSchema = new Schema(
     timestamps: true, // adds createdAt & updatedAt
   },
 );
+
+export const Userchat = models.Userchat || model('Userchat', UserchatSchema);

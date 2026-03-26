@@ -21,6 +21,7 @@ import { AddModelDialog } from './AddmodelDialog';
 import { useAIChat } from '@/hooks/useAi';
 import { useTyping } from '@/lib/zustand/store';
 import { useRouter } from 'next/navigation';
+import { getCurrentuser } from '@/app/(auth)/core/getUser';
 
 export default function ChatInputBox() {
   interface Model {
@@ -59,7 +60,7 @@ export default function ChatInputBox() {
     setAttachedFiles((prev) => prev.filter((f) => f !== name));
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!message.trim() && attachedFiles.length === 0) return;
     if (!modelDetails?.length) {
       setAddModelOpen(true);
@@ -67,6 +68,8 @@ export default function ChatInputBox() {
     }
     if (!selectedModel) setSelectedModel(MODELS[0]);
     const randomChatid = crypto.randomUUID();
+    const userDetails = await getCurrentuser();
+
     sendMessage({
       url: `${selectedModel.url}/api/generate`,
       model: selectedModel.modelname,
@@ -74,6 +77,7 @@ export default function ChatInputBox() {
       type: selectedModel.type,
       apikey: selectedModel.apikey || '',
       randomChatid,
+      userdetails: userDetails,
     });
     // Handle send logic
     setMessage('');
