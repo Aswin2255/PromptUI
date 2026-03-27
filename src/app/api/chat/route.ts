@@ -1,5 +1,6 @@
 import { Chat } from '@/lib/models/Chat';
 import User from '@/lib/models/User';
+import { Userchat } from '@/lib/models/UserChat';
 import redisClient from '@/lib/redisClient';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -14,37 +15,79 @@ export async function POST(req: NextRequest) {
       userMsg,
       userdetails,
     } = body;
-    const userId = await redisClient.get(`session:${userdetails}`);
 
+    const userId = await redisClient.get(`session:${userdetails}`);
     if (!userId) {
       return NextResponse.json({ err: 'Invalid request' }, { status: 400 });
     }
+
     const userDetails = await User.findById(userId);
     if (!userDetails) {
       return NextResponse.json({ err: 'Invalid request' }, { status: 400 });
     }
 
-    if (!model || !aiResponse || !total_duration || !randomid || !userMsg) {
-      return NextResponse.json(
-        { err: 'Invalid input parametes' },
-        { status: 400 },
+    // Check chat already exists
+    const existingChatDoc = await Chat.findById(randomid);
+    if (existingChatDoc) {
+      return NextResponse.json({ err: 'Chat already exists' }, { status: 400 });
+    }
+
+    // Create chat with user + ai message
+    const history = [
+      {
+        role: 'user',
+        message: userMsg,
+      },
+      {
+        role: 'ai',
+        message: aiResponse,
+        model: model,
+        duration: total_duration,
+      },
+    ];
+
+    const newChat = new Chat({
+      _id: randomid,
+      chat_id: randomid,
+      user_id: userDetails._id,
+      history: history,
+    });
+
+    await newChat.save();
+
+    // Add to sidebar
+    const existingUserChat = await Userchat.findOne({
+      user_id: userDetails._id,
+    });
+
+    if (!existingUserChat) {
+      await Userchat.create({
+        user_id: userDetails._id,
+        chats: [
+          {
+            _id: randomid,
+            title: userMsg.substring(0, 30),
+          },
+        ],
+      });
+    } else {
+      await Userchat.updateOne(
+        { user_id: userDetails._id },
+        {
+          $push: {
+            chats: {
+              _id: randomid,
+              title: userMsg.substring(0, 30),
+            },
+          },
+        },
       );
     }
 
-    const existingChat = await User.findOne({ user_id: userDetails._id });
-
-    console.log(existingChat);
-
-    return NextResponse.json(
-      { success: true, message: 'Chat Saved Successfully' },
-      { status: 200 },
-    );
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[/api/chat] POST Error:', error);
-    return NextResponse.json(
-      { err: 'unexpected error occured' },
-      { status: 500 },
-    );
+    console.error(error);
+    return NextResponse.json({ err: 'Server error' }, { status: 500 });
   }
 }
 
