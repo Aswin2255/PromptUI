@@ -9,6 +9,8 @@ interface AIRESPOSNE {
   type: 'local' | 'cloud';
   randomChatid: string;
   userdetails: string | null;
+  usermessageid: string;
+  aimessageid: string;
 }
 interface CHATREPSONSE {
   model: string;

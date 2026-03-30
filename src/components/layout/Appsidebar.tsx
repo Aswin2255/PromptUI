@@ -15,7 +15,6 @@ import {
   Trash2,
 } from 'lucide-react';
 
-import { NavFavorites } from './Navfavorites';
 import { TeamSwitcher } from './Teamswitcher';
 import {
   Sidebar,
@@ -24,8 +23,6 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { SidebarActions } from './SidebarAction';
-import { useGetMessageHistory } from '@/hooks/useAi';
-import { useMessage } from '@/lib/zustand/store';
 
 // This is sample data.
 const data = {
@@ -259,9 +256,9 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { isLoading } = useGetMessageHistory();
-  const { messageDetails } = useMessage();
-  console.log(messageDetails);
+  //const { isLoading } = useGetMessageHistory();
+  //const { messageDetails } = useMessage();
+  //console.log(messageDetails);
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
@@ -269,7 +266,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarActions />
-        <NavFavorites favorites={messageDetails} isLoading={isLoading} />
+        {/*
+            <NavFavorites favorites={} isLoading={isLoading} />
+           */}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

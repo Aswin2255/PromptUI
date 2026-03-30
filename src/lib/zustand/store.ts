@@ -10,12 +10,13 @@ interface Model {
   type: 'local' | 'cloud';
 }
 
-interface Message {
+export interface Message {
   chatsession_id: string;
-  content: string;
   role: 'user' | 'ai';
+  message?: string;
   model: string;
-  createdAt: string;
+  createdAt?: string;
+  typing: boolean;
 }
 
 interface Authstore {
@@ -38,6 +39,8 @@ interface Modelstore {
 interface Messagestore {
   messageDetails: Message[];
   setchatMessage: (message: Message) => void;
+  updateMessage: (chatsession_id: string, message: string) => void;
+  setTyping: (chatsession_id: string, typing: boolean) => void;
 }
 
 export const useAuthUser = create<Authstore>((set) => ({
@@ -74,6 +77,21 @@ export const useMessage = create<Messagestore>((set) => ({
   setchatMessage(message: Message) {
     set((state) => ({ messageDetails: [...state.messageDetails, message] }));
   },
+  // Update message text while streaming
+  updateMessage: (chatsession_id, message) =>
+    set((state) => ({
+      messageDetails: state.messageDetails.map((msg) =>
+        msg.chatsession_id === chatsession_id ? { ...msg, message } : msg,
+      ),
+    })),
+
+  // Update typing status
+  setTyping: (chatsession_id, typing) =>
+    set((state) => ({
+      messageDetails: state.messageDetails.map((msg) =>
+        msg.chatsession_id === chatsession_id ? { ...msg, typing } : msg,
+      ),
+    })),
 }));
 
 export const useTyping = create<Typingstore>((set) => ({

@@ -1,6 +1,7 @@
 'use client';
 import { Bot, User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '../ui/avatar';
+import { useMessage } from '@/lib/zustand/store';
 
 function UserMessage({ content }: { content: string }) {
   return (
@@ -21,7 +22,12 @@ function UserMessage({ content }: { content: string }) {
     </div>
   );
 }
-function AIMessage({ content }: { content: string }) {
+interface AIMessageProps {
+  content: string;
+  typing?: boolean;
+}
+
+function AIMessage({ content, typing = false }: AIMessageProps) {
   return (
     <div className="flex items-start gap-3 px-4 py-2">
       {/* AI Avatar */}
@@ -33,76 +39,35 @@ function AIMessage({ content }: { content: string }) {
 
       {/* Bubble */}
       <div className="max-w-[75%] rounded-2xl rounded-tl-sm bg-muted px-4 py-3 shadow-sm">
-        <p className="text-sm leading-relaxed text-foreground">{content}</p>
+        {typing ? (
+          <div className="flex items-center gap-1 py-1">
+            <span className="h-2 w-2 rounded-full bg-foreground/40 animate-bounce [animation-delay:-0.3s]" />
+            <span className="h-2 w-2 rounded-full bg-foreground/40 animate-bounce [animation-delay:-0.15s]" />
+            <span className="h-2 w-2 rounded-full bg-foreground/40 animate-bounce" />
+          </div>
+        ) : (
+          <p className="text-sm leading-relaxed text-foreground">{content}</p>
+        )}
       </div>
     </div>
   );
 }
 export default function ChatMessage() {
-  const messageDetails = [
-    {
-      message_id: '1',
-      role: 'user',
-      content: 'Hi',
-    },
-    {
-      message_id: '2',
-      role: 'assistant',
-      content: 'Hello! How can I help you today?',
-    },
-    {
-      message_id: '3',
-      role: 'user',
-      content: 'I need help with my project',
-    },
-    {
-      message_id: '4',
-      role: 'assistant',
-      content: 'Sure, tell me more about your project.',
-    },
-    {
-      message_id: '5',
-      role: 'user',
-      content: 'I need help with my project',
-    },
-    {
-      message_id: '6',
-      role: 'assistant',
-      content: 'Sure, tell me more about your project.',
-    },
-    {
-      message_id: '7',
-      role: 'user',
-      content: 'I need help with my project',
-    },
-    {
-      message_id: '8',
-      role: 'assistant',
-      content: 'Sure, tell me more about your project.',
-    },
-    {
-      message_id: '9',
-      role: 'user',
-      content: 'I need help with my project',
-    },
-    {
-      message_id: '10',
-      role: 'assistant',
-      content: 'Sure, tell me more about your project.',
-    },
-  ];
+  const { messageDetails } = useMessage();
+  const messageHistory = messageDetails;
+  console.log(messageHistory);
 
   return (
     <div className="mx-4 mb-6 h-[60vh] container overflow-hidden rounded-2xl  bg-background shadow-sm">
       <div className="h-full overflow-y-auto p-3">
-        {messageDetails?.length ? (
+        {messageHistory?.length ? (
           <div className="flex flex-col gap-2">
-            {messageDetails.map((msg) => (
-              <div key={msg.message_id}>
+            {messageHistory.map((msg) => (
+              <div key={msg.chatsession_id}>
                 {msg.role === 'user' ? (
-                  <UserMessage content={msg.content} />
+                  <UserMessage content={msg.message} />
                 ) : (
-                  <AIMessage content={msg.content} />
+                  <AIMessage content={msg.message} typing={msg.typing} />
                 )}
               </div>
             ))}

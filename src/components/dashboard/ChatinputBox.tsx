@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { useModelHook } from '@/hooks/useChat';
 import { AddModelDialog } from './AddmodelDialog';
 import { useAIChat } from '@/hooks/useAi';
-import { useTyping } from '@/lib/zustand/store';
+import { Message, useTyping } from '@/lib/zustand/store';
 import { useRouter } from 'next/navigation';
 import { getCurrentuser } from '@/app/(auth)/core/getUser';
 
@@ -69,6 +69,21 @@ export default function ChatInputBox() {
     if (!selectedModel) setSelectedModel(MODELS[0]);
     const randomChatid = crypto.randomUUID();
     const userDetails = await getCurrentuser();
+    const userchatMessage: Message = {
+      chatsession_id: crypto.randomUUID(),
+      role: 'user',
+      message: message,
+      model: selectedModel.modelname,
+      typing: false,
+    };
+    const aichatMessage: Message = {
+      chatsession_id: crypto.randomUUID(),
+      role: 'ai',
+      model: selectedModel.modelname,
+      typing: true,
+    };
+    setchatMessage(userchatMessage);
+    setchatMessage(aichatMessage);
 
     sendMessage({
       url: `${selectedModel.url}/api/generate`,
@@ -78,6 +93,8 @@ export default function ChatInputBox() {
       apikey: selectedModel.apikey || '',
       randomChatid,
       userdetails: userDetails,
+      usermessageid: userchatMessage.chatsession_id,
+      aimessageid: aichatMessage.chatsession_id,
     });
     // Handle send logic
     setMessage('');
