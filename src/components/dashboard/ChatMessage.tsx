@@ -2,6 +2,7 @@
 import { Bot, User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { useMessage } from '@/lib/zustand/store';
+import ReactMarkdown from 'react-markdown';
 
 function UserMessage({ content }: { content: string }) {
   return (
@@ -27,17 +28,15 @@ interface AIMessageProps {
   typing?: boolean;
 }
 
-function AIMessage({ content, typing = false }: AIMessageProps) {
+export function AIMessage({ content, typing = false }: AIMessageProps) {
   return (
     <div className="flex items-start gap-3 px-4 py-2">
-      {/* AI Avatar */}
       <Avatar className="h-8 w-8 shrink-0 border border-border shadow-sm">
         <AvatarFallback className="bg-linear-to-br from-violet-500 to-indigo-600 text-white">
           <Bot className="h-4 w-4" />
         </AvatarFallback>
       </Avatar>
 
-      {/* Bubble */}
       <div className="max-w-[75%] rounded-2xl rounded-tl-sm bg-muted px-4 py-3 shadow-sm">
         {typing ? (
           <div className="flex items-center gap-1 py-1">
@@ -46,15 +45,27 @@ function AIMessage({ content, typing = false }: AIMessageProps) {
             <span className="h-2 w-2 rounded-full bg-foreground/40 animate-bounce" />
           </div>
         ) : (
-          <p className="text-sm leading-relaxed text-foreground">{content}</p>
+          <div
+            className="prose prose-sm dark:prose-invert max-w-none
+            prose-p:leading-relaxed prose-p:my-1
+            prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-1
+            prose-ul:my-1 prose-li:my-0.5
+            prose-strong:text-foreground
+            prose-code:bg-muted-foreground/20 prose-code:px-1.5 prose-code:py-0.5
+            prose-code:rounded prose-code:text-xs prose-code:before:content-none
+            prose-code:after:content-none"
+          >
+            <ReactMarkdown>{content}</ReactMarkdown>
+          </div>
         )}
       </div>
     </div>
   );
 }
 export default function ChatMessage() {
-  const { messageDetails } = useMessage();
+  const messageDetails = useMessage((state) => state.messageDetails);
   const messageHistory = messageDetails;
+  console.log('history');
   console.log(messageHistory);
 
   return (

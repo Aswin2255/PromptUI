@@ -13,7 +13,7 @@ interface Model {
 export interface Message {
   chatsession_id: string;
   role: 'user' | 'ai';
-  message?: string;
+  message: string;
   model: string;
   createdAt?: string;
   typing: boolean;

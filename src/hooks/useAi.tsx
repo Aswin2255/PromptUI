@@ -8,7 +8,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 export const useGetMessageHistory = () => {
-  const { setchatMessage, updateMessage } = useMessage();
+  const { setchatMessage } = useMessage();
 
   const query = useQuery({
     queryKey: ['messageHistory'],
@@ -25,20 +25,24 @@ export const useGetMessageHistory = () => {
 };
 
 export const useAIChat = () => {
-  const { updateMessage, setTyping, messageDetails } = useMessage();
+  const messageDetails = useMessage((state) => state.messageDetails);
+  const updateMessage = useMessage((state) => state.updateMessage);
+  const setTyping = useMessage((state) => state.setTyping);
   return useMutation({
     mutationFn: sendmessagetoAi,
     onSuccess: async (response, variables) => {
+      console.log('reached');
       const {
         model,
         response: aiResponse,
         total_duration,
         usermessageid,
-        aimessageid,
       } = response;
+      const { aimessageid } = variables;
+      console.log(aimessageid);
+      console.log(aiResponse);
       updateMessage(aimessageid, aiResponse);
       setTyping(aimessageid, false);
-      console.log(messageDetails);
 
       const randomid = variables?.randomChatid; //we will get every thing passed to the mutate function here
       const userMsg = variables.message;

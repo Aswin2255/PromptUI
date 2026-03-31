@@ -81,6 +81,7 @@ export default function ChatInputBox() {
       role: 'ai',
       model: selectedModel.modelname,
       typing: true,
+      message: '',
     };
     setchatMessage(userchatMessage);
     setchatMessage(aichatMessage);
