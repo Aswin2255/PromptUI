@@ -43,6 +43,20 @@ interface Messagestore {
   setTyping: (chatsession_id: string, typing: boolean) => void;
 }
 
+export interface ChatItem {
+  _id: string;
+  title: string;
+  createdAt: Date;
+}
+
+interface ChatHistoryStore {
+  chats: ChatItem[];
+  setChats: (chats: ChatItem[]) => void;
+  addChat: (chat: ChatItem) => void;
+  removeChat: (id: string) => void;
+  clearChats: () => void;
+}
+
 export const useAuthUser = create<Authstore>((set) => ({
   authUser: {
     name: '',
@@ -99,4 +113,22 @@ export const useTyping = create<Typingstore>((set) => ({
   setistyping(value: boolean) {
     set({ isTyping: value });
   },
+}));
+
+export const useChatHistory = create<ChatHistoryStore>((set) => ({
+  chats: [],
+
+  setChats: (chats) => set({ chats }),
+
+  addChat: (chat) =>
+    set((state) => ({
+      chats: [...state.chats, chat],
+    })),
+
+  removeChat: (id) =>
+    set((state) => ({
+      chats: state.chats.filter((chat) => chat._id !== id),
+    })),
+
+  clearChats: () => set({ chats: [] }),
 }));

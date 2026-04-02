@@ -1,14 +1,10 @@
-import { useMessage } from '@/lib/zustand/store';
-import {
-  getmessageHistory,
-  savetoDb,
-  sendmessagetoAi,
-} from '@/services/aiservices';
+import { useChatHistory, useMessage } from '@/lib/zustand/store';
+import { getmessageHistory, sendmessagetoAi } from '@/services/aiservices';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 export const useGetMessageHistory = () => {
-  const { setchatMessage } = useMessage();
+  const { setChats } = useChatHistory();
 
   const query = useQuery({
     queryKey: ['messageHistory'],
@@ -17,9 +13,9 @@ export const useGetMessageHistory = () => {
 
   useEffect(() => {
     if (query.data) {
-      setchatMessage(query.data);
+      setChats(query.data);
     }
-  }, [query.data, setchatMessage]);
+  }, [query.data, setChats]);
 
   return query; // ✅ still returns query so you can use isLoading, isError etc in component
 };

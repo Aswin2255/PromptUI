@@ -23,6 +23,9 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { SidebarActions } from './SidebarAction';
+import { useGetMessageHistory } from '@/hooks/useAi';
+import { useChatHistory, useMessage } from '@/lib/zustand/store';
+import { NavFavorites } from './Navfavorites';
 
 // This is sample data.
 const data = {
@@ -256,9 +259,9 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  //const { isLoading } = useGetMessageHistory();
-  //const { messageDetails } = useMessage();
-  //console.log(messageDetails);
+  const { isLoading } = useGetMessageHistory();
+  const { chats } = useChatHistory();
+
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
@@ -266,9 +269,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarActions />
-        {/*
-            <NavFavorites favorites={} isLoading={isLoading} />
-           */}
+
+        <NavFavorites isloading={isLoading} chats={chats} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

@@ -91,16 +91,26 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    return NextResponse.json(
-      {
-        status: true,
+    const { searchParams } = new URL(req.url);
+    const sessionid = searchParams.get('sessionid');
 
-        message: 'Message fetched sucessfully',
-      },
-      { status: 200 },
-    );
+    const userId = await redisClient.get(`session:${sessionid}`);
+    if (!userId) {
+      return NextResponse.json({ err: 'Invalid request' }, { status: 400 });
+    }
+
+    const userDetails = await User.findById(userId);
+    if (!userDetails) {
+      return NextResponse.json({ err: 'Invalid request' }, { status: 400 });
+    }
+    const userchatHistory = await Userchat.find({ user_id: userDetails._id });
+    return NextResponse.json({
+      status: true,
+      chathistory: userchatHistory,
+      message: 'Chat history retrieved successfully',
+    });
   } catch (error) {
     console.error('[/api/chat] GET Error:', error);
     return NextResponse.json(
