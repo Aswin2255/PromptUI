@@ -1,5 +1,9 @@
 import { useChatHistory, useMessage } from '@/lib/zustand/store';
-import { getmessageHistory, sendmessagetoAi } from '@/services/aiservices';
+import {
+  getmessageHistory,
+  savetoDb,
+  sendmessagetoAi,
+} from '@/services/aiservices';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -27,7 +31,6 @@ export const useAIChat = () => {
   return useMutation({
     mutationFn: sendmessagetoAi,
     onSuccess: async (response, variables) => {
-      console.log('reached');
       const {
         model,
         response: aiResponse,
@@ -44,7 +47,7 @@ export const useAIChat = () => {
       const userMsg = variables.message;
       const userdetails = variables.userdetails;
 
-      /*await savetoDb({
+      await savetoDb({
         model,
         aiResponse,
         total_duration,
@@ -52,7 +55,6 @@ export const useAIChat = () => {
         userMsg,
         userdetails,
       });
-      */
     },
   });
 };

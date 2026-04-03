@@ -25,60 +25,23 @@ export const sendmessagetoAi = async ({
   apikey,
   message,
   model,
-  onChunk,
-}: AIRESPOSNE & { onChunk: (text: string) => void }) => {
+}: AIRESPOSNE) => {
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: apikey ? `Bearer ${apikey}` : '',
-      },
-      body: JSON.stringify({
-        model,
+    const { data } = await axios.post(
+      url,
+      {
+        model: model,
         prompt: message,
-        stream: true,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
-
-    if (!response.body) {
-      throw new Error('No response body found');
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    let fullText = '';
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-
-        const parsed = JSON.parse(line);
-        const chunk = parsed.response || '';
-
-        fullText += chunk;
-        onChunk(fullText);
-      }
-    }
-
-    return {
-      response: fullText,
-    };
+        stream: false,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: apikey ? `Bearer ${apikey}` : undefined,
+        },
+      },
+    );
+    return data;
   } catch (error) {
     throw error;
   }
