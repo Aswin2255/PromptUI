@@ -59,7 +59,7 @@ export const getmessageHistory = async () => {
   try {
     const { data } = await api.get('/api/chat');
     if (data.status) {
-      return data.chathistory;
+      return data.chathistory[0].chats;
     }
   } catch (error) {
     throw error;

@@ -2,11 +2,13 @@ import { Chat } from '@/lib/models/Chat';
 import User from '@/lib/models/User';
 import { Userchat } from '@/lib/models/UserChat';
 import redisClient from '@/lib/redisClient';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log(body);
     const {
       model,
       aiResponse,
@@ -26,12 +28,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ err: 'Invalid request' }, { status: 400 });
     }
 
-    // Check chat already exists
-    const existingChatDoc = await Chat.findById(randomid);
-    if (existingChatDoc) {
-      return NextResponse.json({ err: 'Chat already exists' }, { status: 400 });
-    }
-
     // Create chat with user + ai message
     const history = [
       {
@@ -47,9 +43,7 @@ export async function POST(req: NextRequest) {
     ];
 
     const newChat = new Chat({
-      _id: randomid,
-      chat_id: randomid,
-      user_id: userDetails._id,
+      user_id: userDetails?._id,
       history: history,
     });
 
@@ -91,12 +85,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const sessionid = searchParams.get('sessionid');
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('session_id')?.value;
 
-    const userId = await redisClient.get(`session:${sessionid}`);
+    const userId = await redisClient.get(`session:${sessionId}`);
     if (!userId) {
       return NextResponse.json({ err: 'Invalid request' }, { status: 400 });
     }
