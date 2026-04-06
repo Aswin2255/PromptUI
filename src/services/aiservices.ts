@@ -65,3 +65,14 @@ export const getmessageHistory = async () => {
     throw error;
   }
 };
+
+export const getchatHistory = async (chatid: string) => {
+  try {
+    const { data } = await api.get(`/api/chat/${chatid}`);
+    if (data?.status) {
+      return data.chathistory;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

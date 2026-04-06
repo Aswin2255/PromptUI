@@ -6,6 +6,10 @@ const ChatSchema = new Schema(
       type: String,
       required: true,
     },
+    chatsession_id: {
+      type: String,
+      required: true,
+    },
     history: [
       {
         role: {

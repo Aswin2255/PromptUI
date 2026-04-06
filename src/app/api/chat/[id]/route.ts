@@ -1,4 +1,4 @@
-import { Chat } from '@/lib/models/Chathistory';
+import { Chat } from '@/lib/models/Chat';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -9,6 +9,7 @@ export async function GET(
     const { id } = params;
 
     const messages = await Chat.find({ chatsession_id: id });
+    console.log(messages);
 
     if (!messages.length) {
       return NextResponse.json(

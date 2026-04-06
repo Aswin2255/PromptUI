@@ -3,6 +3,8 @@ import { Bot, User } from 'lucide-react';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { useMessage } from '@/lib/zustand/store';
 import ReactMarkdown from 'react-markdown';
+import { useChathistory } from '@/hooks/useAi';
+import { useParams } from 'next/navigation';
 
 function UserMessage({ content }: { content: string }) {
   return (
@@ -65,8 +67,9 @@ export function AIMessage({ content, typing = false }: AIMessageProps) {
 export default function ChatMessage() {
   const messageDetails = useMessage((state) => state.messageDetails);
   const messageHistory = messageDetails;
-  console.log('history');
-  console.log(messageHistory);
+  const params = useParams();
+  const chatId: string = params.id;
+  const { isLoading } = useChathistory(chatId);
 
   return (
     <div className="mx-4 mb-6 h-[60vh] container overflow-hidden rounded-2xl  bg-background shadow-sm">

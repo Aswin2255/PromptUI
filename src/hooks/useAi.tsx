@@ -1,5 +1,6 @@
 import { useChatHistory, useMessage } from '@/lib/zustand/store';
 import {
+  getchatHistory,
   getmessageHistory,
   savetoDb,
   sendmessagetoAi,
@@ -7,15 +8,38 @@ import {
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+export const useChathistory = (chatId: string) => {
+  const setChats = useMessage((state) => state.setchatMessage);
+
+  const query = useQuery({
+    queryKey: ['chatHistory', chatId],
+    queryFn: () => getchatHistory(chatId),
+    enabled: !!chatId,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (query.data) {
+      setChats(query.data);
+    }
+  }, [query.data]);
+
+  return query;
+};
+
 export const useGetMessageHistory = () => {
+  console.log('use get message hostory is running....');
   const { setChats } = useChatHistory();
 
   const query = useQuery({
     queryKey: ['messageHistory'],
     queryFn: getmessageHistory,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
+    console.log('useeffect works');
     if (query.data) {
       setChats(query.data);
     }

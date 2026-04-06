@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
     ];
 
     const newChat = new Chat({
+      chatsession_id: randomid,
       user_id: userDetails?._id,
       history: history,
     });
