@@ -10,7 +10,21 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Cpu, Shield, Globe, Lock } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Cpu, Shield, Lock } from 'lucide-react';
+
+const CLOUD_MODELS = [
+  'gpt-4o',
+  'gpt-4.1',
+  'claude-3.7-sonnet',
+  'gemini-2.5-pro',
+];
 
 interface Model {
   modelname: string;
@@ -32,16 +46,19 @@ export function AddModelDialog({
 }: AddModelDialogProps) {
   const [modelType, setModelType] = useState<'local' | 'cloud'>('cloud');
   const [modelName, setModelName] = useState('');
-  const [modelUrl, setModelUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
 
-  const isFormValid =
-    modelName && modelUrl && (modelType === 'local' || apiKey);
+  const isFormValid = Boolean(modelName && (modelType === 'local' || apiKey));
+
+  const handleModelTypeChange = (type: 'local' | 'cloud') => {
+    setModelType(type);
+    setModelName('');
+  };
 
   const handleSave = () => {
     const modelData: Model = {
       modelname: modelName,
-      url: modelUrl,
+      url: '',
       apikey: modelType === 'cloud' ? apiKey : '',
       type: modelType,
     };
@@ -53,7 +70,6 @@ export function AddModelDialog({
   const handleReset = () => {
     setAddModelOpen(false);
     setModelName('');
-    setModelUrl('');
     setApiKey('');
     setModelType('cloud');
   };
@@ -89,7 +105,7 @@ export function AddModelDialog({
               <Button
                 type="button"
                 variant={modelType === 'local' ? 'default' : 'outline'}
-                onClick={() => setModelType('local')}
+                onClick={() => handleModelTypeChange('local')}
                 className="flex-1"
               >
                 Local Model
@@ -98,7 +114,7 @@ export function AddModelDialog({
               <Button
                 type="button"
                 variant={modelType === 'cloud' ? 'default' : 'outline'}
-                onClick={() => setModelType('cloud')}
+                onClick={() => handleModelTypeChange('cloud')}
                 className="flex-1"
               >
                 Cloud Model
@@ -109,31 +125,27 @@ export function AddModelDialog({
           {/* Model Name */}
           <div className="grid gap-2">
             <Label htmlFor="modelname">Model Name</Label>
-            <Input
-              id="modelname"
-              placeholder="e.g. gpt-4o, llama3"
-              value={modelName}
-              onChange={(e) => setModelName(e.target.value)}
-            />
-          </div>
-
-          {/* Model URL */}
-          <div className="grid gap-2">
-            <Label htmlFor="modelurl" className="flex items-center gap-1.5">
-              <Globe className="h-3.5 w-3.5" />
-              Model URL
-            </Label>
-
-            <Input
-              id="modelurl"
-              placeholder={
-                modelType === 'local'
-                  ? 'http://localhost:11434'
-                  : 'https://api.example.com/v1'
-              }
-              value={modelUrl}
-              onChange={(e) => setModelUrl(e.target.value)}
-            />
+            {modelType === 'cloud' ? (
+              <Select value={modelName} onValueChange={setModelName}>
+                <SelectTrigger id="modelname" className="w-full">
+                  <SelectValue placeholder="Select a cloud model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CLOUD_MODELS.map((cloudModel) => (
+                    <SelectItem key={cloudModel} value={cloudModel}>
+                      {cloudModel}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="modelname"
+                placeholder="e.g. llama3"
+                value={modelName}
+                onChange={(e) => setModelName(e.target.value)}
+              />
+            )}
           </div>
 
           {/* API Key (only for cloud) */}

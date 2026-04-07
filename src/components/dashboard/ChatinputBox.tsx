@@ -22,6 +22,7 @@ import { useAIChat } from '@/hooks/useAi';
 import { Message, useTyping } from '@/lib/zustand/store';
 import { useRouter } from 'next/navigation';
 import { getCurrentuser } from '@/app/(auth)/core/getUser';
+import { getModelApiUrl } from '@/lib/aiproviders';
 
 export default function ChatInputBox() {
   interface Model {
@@ -86,8 +87,16 @@ export default function ChatInputBox() {
     setchatMessage(userchatMessage);
     setchatMessage(aichatMessage);
 
+    let url = '';
+
+    if (selectedModel.type === 'cloud') {
+      url = getModelApiUrl(selectedModel.modelname);
+    } else {
+      url = selectedModel.url;
+    }
+
     sendMessage({
-      url: `${selectedModel.url}/api/generate`,
+      url: url,
       model: selectedModel.modelname,
       message: message,
       type: selectedModel.type,
